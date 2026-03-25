@@ -1,1 +1,160 @@
+create schema sbx;
+
+set search_path to sbx;
+
+---------------------------------------------
+
+drop table if exists employees_programmer;
+create table employees_programmer as
+select
+	employee_id,
+	first_name,
+	last_name,
+	email,
+	phone,
+	hire_date,
+	manager_id
+from lessons_database.employees
+where job_title = 'Programmer';
+
+---------------------------------------------
+
+create view v_employees_programmer as
+select
+	employee_id,
+	first_name,
+	last_name,
+	email,
+	phone,
+	hire_date,
+	manager_id
+from lessons_database.employees
+where job_title = 'Programmer';
+
+---------------------------------------------
+
+update lessons_database.employees
+set manager_id = manager_id + 1
+where job_title = 'Programmer';
+
+update lessons_database.employees
+set manager_id = manager_id - 1
+where job_title = 'Programmer';
+
+---------------------------------------------
+
+select * from employees_programmer;
+
+select * from v_employees_programmer;
+
+---------------------------------------------
+
+view 
+
+- большая нагрузка на оперативную память
+- малая нагрузка на жесткий диск
+- более свежие данные в реальном времени
+
+table
+
+- маленькая нагрузка на оперативную память
+- большая нагрузка на жесткий диск
+- данные на момент создания
+
+---------------------------------------------
+
+select concat('hello', 'world');
+select concat('hello', ' ', 'world', ' ', 'bibi', ' ', 'labu');
+select concat_ws(' ', 'hello', 'world', 'bibi', 'labu');
+select 'hello' || ' ' || 'world' as new_column;
+
+---------------------------------------------
+
 set search_path to lessons_database;
+
+select * from employees;
+
+---------------------------------------------
+
+-- написать запрос, который выводит first_name, last_name, full_name
+
+select first_name || ' ' || last_name as full_name
+from employees;
+
+-- если empoloyee_id четный, то пол мужской, в ином случае женский
+
+select 
+    first_name || ' ' || last_name as full_name,
+    employee_id,
+    case 
+        when employee_id % 2 = 0 then 'Mr'
+        else 'Ms'
+    end as gender
+from employees;
+
+-- к каждому full_name добавить mr или ms
+
+select 
+	concat_ws(' ',
+		case 
+	        when employee_id % 2 = 0 then 'Mr.'
+	        else 'Ms.'
+	    end,
+	    first_name,
+	    last_name
+	   ) as full_name
+	from employees;
+
+---------------------------------------------
+
+select length('hello');
+select upper('hello');
+select lower('hello');
+
+select substring('PostgreSQL lesson', 8, 3); -- с 8 символа 3 следующих
+select substring('PostgreSQL lesson', 8); -- с 8 символа
+select substring('PostgreSQL lesson' from 8); -- не использовать from
+select substring('PostgreSQL lesson', length('PostgreSQL lesson') - 5); -- с обратной стороны
+
+---------------------------------------------
+
+-- сформировать поле short_name, которое состоит из первых пяти символов имени компании и трех точек
+
+select 
+	name,
+	substring(name, 1, 5) || '...' as short_name
+from customers;
+ 
+-- добавить проверку: если длина имени больше четырех символов, то обрезать и добавить троеточие. в ином случае оставить имя как есть
+
+select
+	name,
+	case 
+		when length(name) > 4 
+			then trim(substring(name, 1, 5)) || '...'
+		else name
+	end as short_name
+from customers;
+
+select trim('      hello world      ');
+
+---------------------------------------------
+
+ select replace('hello world', 'world', 'postgreSQL');
+ 
+ select 
+ 	phone as old_phone_format,
+ 	replace(phone, '.', '-') as phone
+ from employees;
+
+---------------------------------------------
+ 
+ select position('world' in 'hello world my friends');
+ 
+-- написать запрос, который выводит имя, фамилию и юзернейм (юзернейм - подстрока в почте до @)
+
+select
+	first_name,
+	last_name,
+	substring(email, 1, position('@' in email) - 1) as username
+ from employees;
