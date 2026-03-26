@@ -1,0 +1,110 @@
+select 
+
+	case 
+		when first_name is null 
+		then substring(last_name, 1, position(' ' in last_name))
+	else 
+	
+		case
+			when position(' ' in first_name) > 0
+			then substring(first_name, 1, position(' ' in first_name))
+		else  first_name end
+	end as first_name,
+	
+			case 
+				when last_name is null 
+				then substring(first_name, position(' ' in first_name) + 1)
+			else substring(last_name, position(' ' in last_name) + 1)
+		end as last_name,
+		
+				case 
+					when substring(gender, 1, 1) = 'M' 
+					then replace(gender, gender, '1')
+				else replace(gender, gender, '2')
+			end as gender,
+			
+					case
+						when position('@' in email) > 0
+							and position(' ' in email) > 0
+						then substring(email, 1, position(' ' in email))
+							when position('@' in email) > 0
+								and position(' ' in email) = 0
+							then email
+					else null
+				end as email,
+	
+						case
+							when position('@' in email) = 0
+							then email
+								when position('@' in email) > 0
+									and  position(' ' in email) > 0
+								then substring(email, position(' ' in email))
+									when position('@' in email) > 0
+										and position(' ' in email) = 0
+									then null	
+							else null
+						end as phone
+						
+from datasource;
+
+--------------------------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------------------------------------
+
+-- 1. поле gender
+
+select 
+	first_name,
+	last_name, 
+	email,
+	case 
+		when substring(gender, 1, 1) = 'M' 
+		then replace(gender, gender, '1')
+		else replace(gender, gender, '2')
+	end as gender
+from datasource;
+
+-- 2. поля first_name и last_name
+
+select 
+	case 
+		when first_name is null 
+		then substring(last_name, 1, position(' ' in last_name))
+	else 
+		case
+			when position(' ' in first_name) > 0
+			then substring(first_name, 1, position(' ' in first_name))
+		else  first_name end
+	end as first_name,
+	case 
+		when last_name is null 
+		then substring(first_name, position(' ' in first_name) + 1)
+		else substring(last_name, position(' ' in last_name) + 1)
+	end as last_name
+from datasource;
+
+-- 3. поле email
+	
+	select
+		case
+			when position('@' in email) > 0
+				and position(' ' in email) > 0
+			then substring(email, 1, position(' ' in email))
+				when position('@' in email) > 0
+					and position(' ' in email) = 0
+				then email
+			else null
+		end as email,
+		case
+			when position('@' in email) = 0
+			then email
+				when position('@' in email) > 0
+					and  position(' ' in email) > 0
+				then substring(email, position(' ' in email))
+					when position('@' in email) > 0
+						and position(' ' in email) = 0
+					then null	
+			else null
+		end as phone
+from datasource;
